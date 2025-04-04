@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание занятий</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+        .day-highlight {
+            font-weight: 700;
+            color: #3182ce;
+            font-size: 1.3em;
+            text-align: center;
+            margin-bottom: 25px;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .schedule-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3182ce;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .schedule-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .time {
+            font-weight: 700;
+            color: #2c5282;
+            margin-bottom: 5px;
+        }
+        .date-info {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .group-info {
+            text-align: center;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .week-type {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #e6fffa 0%, #bee3f8 100%);
+            padding: 12px;
+            border-radius: 8px;
+            color: #2c5282;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .multilang-date {
+            font-size: 1em;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Стили для вкладок */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Стили для недельного расписания */
+        .day-schedule {
+            margin-bottom: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .day-title {
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #2c5282;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #e6fffa 0%, #bee3f8 100%);
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Расписание занятий</h1>
+        <div class="group-info" id="group-name">24-ВТО/24-ОПО</div>
+        <div class="date-info" id="current-date"></div>
+        <div class="multilang-date" id="multilang-month"></div>
+        <div class="week-type" id="week-type"></div>
+        
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('today')">На сегодня</button>
+            <button class="tab-button" onclick="showTab('week')">На всю неделю</button>
+        </div>
+        
+        <!-- Вкладка на сегодня -->
+        <div id="today-tab" class="tab-content active">
+            <div class="day-highlight" id="current-day"></div>
+            <div id="schedule-container"></div>
+        </div>
+        
+        <!-- Вкладка на всю неделю -->
+        <div id="week-tab" class="tab-content">
+            <div id="week-schedule-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Получение текущего дня недели и даты
+        function getCurrentDayInfo() {
+            const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            const monthsEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthsKz = ['қаңтар', 'ақпан', 'наурыз', 'сәуір', 'мамыр', 'маусым', 'шілде', 'тамыз', 'қыркүйек', 'қазан', 'қараша', 'желтоқсан'];
+            
+            const now = new Date();
+            
+            return {
+                dayName: days[now.getDay()],
+                date: now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+                multilang: {
+                    ru: months[now.getMonth()],
+                    en: monthsEn[now.getMonth()],
+                    kz: monthsKz[now.getMonth()]
+                },
+                dayOfMonth: now.getDate(),
+                month: now.getMonth(),
+                year: now.getFullYear()
+            };
+        }
+
+        // Определение типа недели (Числительная/Знаменательная)
+        function getWeekType(date) {
+            // Получаем номер недели в году
+            const startDate = new Date(date.getFullYear(), 0, 1);
+            const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));
+            const weekNumber = Math.ceil(days / 7);
+            
+            // Проверяем по данным из изображения
+            // Это примерная реализация, вы можете настроить логику в соответствии с вашим календарем
+            const isEven = weekNumber % 2 === 0;
+            
+            // На основе изображения календаря (примерная логика)
+            // Проверяем месяц и день для точного определения типа недели
+            let momentousWeek = false;
+            
+            // Получаем месяц и день
+            const month = date.getMonth(); // 0-11 (январь-декабрь)
+            const day = date.getDate();
+
+            // Проверяем по данным из изображения для каждого месяца
+            switch(month) {
+                case 0: // Январь
+                    momentousWeek = [13,14,15,16,17,3,4,5,6,7,17,18,19,20,21].includes(day);
+                    break;
+                case 1: // Февраль
+                    momentousWeek = [3,4,5,6,7,17,18,19,20,21].includes(day);
+                    break;
+                case 2: // Март
+                    momentousWeek = [3,4,5,6,7,17,18,19,20,21].includes(day);
+                    break;
+                case 3: // Апрель
+                    momentousWeek = [1,2,3,4,14,15,16,17,18,28,29,30].includes(day);
+                    break;
+                case 4: // Май
+                    momentousWeek = [1,2,12,13,14,15,16,26,27,28,29,30].includes(day);
+                    break;
+                default:
+                    momentousWeek = isEven; // По умолчанию используем чередование недель
+            }
+            
+            return {
+                isNumeralWeek: !momentousWeek,
+                isMomentousWeek: momentousWeek,
+                weekNumber: weekNumber
+            };
+        }
+
+        // Расписание по дням недели
+        const schedules = {
+            'Понедельник': [
+                { time: '08:00 - 9:30', activity: 'Введение в специальность (ауд. 203/303)' },
+                { time: '9:40 - 11:10', activity: 'Русский язык (ауд. 404)' },
+                { time: '11:40 - 13:10', activity: 'Физкультура (С/З)' },
+                { time: '13:20 - 14:50', activity: 'Химия (ауд. 205)' }
+            ],
+            'Вторник': [
+                { time: '08:00 - 9:30', activity: 'История Казахстана (ауд. 404)' },
+                { time: '9:40 - 11:10', activity: 'Казахский язык (ауд. 403)' },
+                { time: '11:40 - 13:10', activity: 'Физика (ауд. 305)' },
+                { time: '13:20 - 14:50', activity: 'НВП (ауд. 402)' }
+            ],
+            'Среда': [
+                { time: '08:00 - 9:30', activity: 'Глобальные компитенции/Грфика и проектирование (ауд. 209/310)' },
+                { time: '9:40 - 11:10', activity: 'Русская Литература (ауд. 404)' },
+                { time: '11:40 - 13:10', activity: 'История Казахстана (ауд. 404)' },
+                { time: '13:20 - 14:50', activity: 'Час Психолога (ауд. 310)' }
+            ],
+            'Четверг': [
+                { time: '08:00 - 9:30', activity: 'География (ауд. 404)' },
+                { time: '9:40 - 11:10', activity: 'Информатика (ауд. 302)' },
+                { time: '11:40 - 13:10', activity: 'Математика (ауд. 401)' },
+                { time: '13:20 - 14:50', activity: 'Кураторский час (ауд. 310)' }
+            ],
+            'Пятница': [
+                { time: '11:40 - 13:10', activity: 'Биология/Всемирная история (ауд. 205/408)' },
+                { time: '9:40 - 11:10', activity: 'Физкультура (С/З)' },
+                { time: '11:40 - 13:10', activity: 'Введение в специальность (ауд. 203/303)' },
+                { time: '13:20 - 14:50', activity: 'Математика (ауд. 401)' }
+            ],
+            'Суббота': [
+                { time: '', activity: 'Выходной день' }
+            ],
+            'Воскресенье': [
+                { time: '', activity: 'Выходной день' }
+            ]
+        };
+
+        // Переключение между вкладками
+        function showTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убираем активный класс у всех кнопок
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Показываем нужную вкладку
+            if (tabName === 'today') {
+                document.getElementById('today-tab').classList.add('active');
+                document.querySelector('.tab-button:nth-child(1)').classList.add('active');
+            } else if (tabName === 'week') {
+                document.getElementById('week-tab').classList.add('active');
+                document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+                // Генерируем расписание на неделю при первом открытии вкладки
+                if (document.getElementById('week-schedule-container').children.length === 0) {
+                    generateWeekSchedule();
+                }
+            }
+        }
+        
+        // Функция для создания элемента расписания
+        function createScheduleItem(item) {
+            const scheduleItem = document.createElement('div');
+            scheduleItem.className = 'schedule-item';
+            
+            const timeSpan = document.createElement('div');
+            timeSpan.className = 'time';
+            timeSpan.textContent = item.time;
+            
+            const activityDiv = document.createElement('div');
+            activityDiv.textContent = item.activity;
+            
+            scheduleItem.appendChild(timeSpan);
+            scheduleItem.appendChild(activityDiv);
+            
+            return scheduleItem;
+        }
+        
+        // Генерация расписания на всю неделю (пн-пт)
+        function generateWeekSchedule() {
+            const weekContainer = document.getElementById('week-schedule-container');
+            weekContainer.innerHTML = '';
+            
+            // Массив дней недели (только пн-пт)
+            const workDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
+            
+            // Создаем расписание для каждого дня
+            workDays.forEach(day => {
+                const daySchedule = document.createElement('div');
+                daySchedule.className = 'day-schedule';
+                
+                const dayTitle = document.createElement('div');
+                dayTitle.className = 'day-title';
+                dayTitle.textContent = day;
+                daySchedule.appendChild(dayTitle);
+                
+                // Добавляем занятия для данного дня
+                const dayItems = schedules[day];
+                if (dayItems && dayItems.length > 0) {
+                    dayItems.forEach(item => {
+                        const scheduleItem = createScheduleItem(item);
+                        daySchedule.appendChild(scheduleItem);
+                    });
+                } else {
+                    const noScheduleItem = document.createElement('div');
+                    noScheduleItem.className = 'schedule-item';
+                    noScheduleItem.textContent = 'На этот день расписание отсутствует';
+                    daySchedule.appendChild(noScheduleItem);
+                }
+                
+                weekContainer.appendChild(daySchedule);
+            });
+        }
+
+        // Отображаем расписание при загрузке страницы
+        window.onload = function() {
+            const now = new Date();
+            const dayInfo = getCurrentDayInfo();
+            const today = dayInfo.dayName;
+            
+            // Выводим текущий день и дату
+            document.getElementById('current-day').textContent = today;
+            document.getElementById('current-date').textContent = dayInfo.date;
+            
+            // Выводим многоязычное отображение месяца
+            document.getElementById('multilang-month').innerHTML = 
+                `${dayInfo.dayOfMonth} ${dayInfo.multilang.ru} / ${dayInfo.dayOfMonth} ${dayInfo.multilang.en} / ${dayInfo.dayOfMonth} ${dayInfo.multilang.kz} ${dayInfo.year}`;
+            
+            // Определяем и отображаем тип недели
+            const weekType = getWeekType(now);
+            document.getElementById('week-type').innerHTML = 
+                weekType.isMomentousWeek 
+                ? 'Знаменательная неделя / Momentous week / Екінші апта' 
+                : 'Числительная неделя / Numeral week / Бірінші апта';
+            
+            // Получаем расписание на сегодня
+            const todaySchedule = schedules[today];
+            const scheduleContainer = document.getElementById('schedule-container');
+            
+            // Очищаем контейнер перед заполнением
+            scheduleContainer.innerHTML = '';
+            
+            // Заполняем расписание на сегодня
+            if (todaySchedule && todaySchedule.length > 0) {
+                todaySchedule.forEach(item => {
+                    const scheduleItem = createScheduleItem(item);
+                    scheduleContainer.appendChild(scheduleItem);
+                });
+            } else {
+                const noScheduleItem = document.createElement('div');
+                noScheduleItem.className = 'schedule-item';
+                noScheduleItem.textContent = 'На сегодня расписание отсутствует';
+                scheduleContainer.appendChild(noScheduleItem);
+            }
+        };
+    </script>
+</body>
+</html>
